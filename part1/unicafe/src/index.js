@@ -55,6 +55,14 @@ const Statistics = (props) => {
         return (good / total) * 100 + ' %'
     }
 
+    // check whether feedback has been submitted
+
+    if (totalFeedback() === 0) {
+        return (
+            <p>No feedback given</p>
+        )
+    }
+
     return (
         <>
             <Header text="statistics" />
