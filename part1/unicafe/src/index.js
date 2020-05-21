@@ -14,7 +14,10 @@ const Button = ({ text, role }) => {
 
 const Statistic = ({ text, value }) => {
     return (
-        <p>{text} {value}</p>
+        <tr>
+            <td>{text}</td>
+            <td>{value}</td>
+        </tr>
     )
 }
 
@@ -22,6 +25,9 @@ const Statistics = (props) => {
     const good = props.good
     const neutral = props.neutral
     const bad = props.bad
+
+    // round to decimal places
+    const decimals = 1
 
     // return total amount of feedback
     const totalFeedback = () => good + neutral + bad
@@ -42,7 +48,7 @@ const Statistics = (props) => {
         // calculate average
         const avgScore = (goodScore + neutralScore + badScore) / total
 
-        return avgScore
+        return avgScore.toFixed(decimals)
     }
 
     // return % of feedback that is positive
@@ -51,8 +57,10 @@ const Statistics = (props) => {
             return 0
         }
         const total = totalFeedback()
+        const positivePercentage = (good / total) * 100
 
-        return (good / total) * 100 + ' %'
+        // output percent with % sign appended
+        return positivePercentage.toFixed(decimals) + ' %'
     }
 
     // check whether feedback has been submitted
@@ -66,12 +74,16 @@ const Statistics = (props) => {
     return (
         <>
             <Header text="statistics" />
-            <Statistic text="good" value={good} />
-            <Statistic text="neutral" value={neutral} />
-            <Statistic text="bad" value={bad} />
-            <Statistic text="all" value={totalFeedback()} />
-            <Statistic text="average" value={feedbackAverage()} />
-            <Statistic text="positive" value={positiveFeedback()} />
+            <table>
+                <tbody>
+                    <Statistic text="good" value={good} />
+                    <Statistic text="neutral" value={neutral} />
+                    <Statistic text="bad" value={bad} />
+                    <Statistic text="all" value={totalFeedback()} />
+                    <Statistic text="average" value={feedbackAverage()} />
+                    <Statistic text="positive" value={positiveFeedback()} />
+                </tbody>
+            </table>
         </>
     )
 }
