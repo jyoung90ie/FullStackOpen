@@ -57,6 +57,10 @@ const Statistics = (props) => {
 
     return (
         <>
+            <Header text="statistics" />
+            <Feedback text="good" value={good} />
+            <Feedback text="neutral" value={neutral} />
+            <Feedback text="bad" value={bad} />
             <Feedback text="all" value={totalFeedback()} />
             <Feedback text="average" value={feedbackAverage()} />
             <Feedback text="positive" value={positiveFeedback()} />
@@ -75,12 +79,7 @@ const App = () => {
             <Button text="good" role={() => setGood(good + 1)} />
             <Button text="neutral" role={() => setNeutral(neutral + 1)} />
             <Button text="bad" role={() => setBad(bad + 1)} />
-            <Header text="statistics" />
-            <Feedback text="good" value={good} />
-            <Feedback text="neutral" value={neutral} />
-            <Feedback text="bad" value={bad} />
             <Statistics good={good} neutral={neutral} bad={bad} />
-
         </div>
     )
 }
