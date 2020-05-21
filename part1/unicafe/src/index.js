@@ -18,13 +18,15 @@ const Feedback = ({ text, value }) => {
     )
 }
 
-const App = () => {
-    const [good, setGood] = useState(0)
-    const [neutral, setNeutral] = useState(0)
-    const [bad, setBad] = useState(0)
+const Statistics = (props) => {
+    const good = props.good
+    const neutral = props.neutral
+    const bad = props.bad
 
+    // return total amount of feedback
     const totalFeedback = () => good + neutral + bad
 
+    // assign scores and return average score of feedback
     const feedbackAverage = () => {
         // total feedback
         const total = totalFeedback()
@@ -43,6 +45,7 @@ const App = () => {
         return avgScore
     }
 
+    // return % of feedback that is positive
     const positiveFeedback = () => {
         if (good === 0) {
             return 0
@@ -52,6 +55,19 @@ const App = () => {
         return (good / total) * 100 + ' %'
     }
 
+    return (
+        <>
+            <Feedback text="all" value={totalFeedback()} />
+            <Feedback text="average" value={feedbackAverage()} />
+            <Feedback text="positive" value={positiveFeedback()} />
+        </>
+    )
+}
+
+const App = () => {
+    const [good, setGood] = useState(0)
+    const [neutral, setNeutral] = useState(0)
+    const [bad, setBad] = useState(0)
 
     return (
         <div>
@@ -63,9 +79,7 @@ const App = () => {
             <Feedback text="good" value={good} />
             <Feedback text="neutral" value={neutral} />
             <Feedback text="bad" value={bad} />
-            <Feedback text="all" value={totalFeedback()} />
-            <Feedback text="average" value={feedbackAverage()} />
-            <Feedback text="positive" value={positiveFeedback()} />
+            <Statistics good={good} neutral={neutral} bad={bad} />
 
         </div>
     )
