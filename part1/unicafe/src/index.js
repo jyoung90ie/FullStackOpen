@@ -12,7 +12,7 @@ const Button = ({ text, role }) => {
     )
 }
 
-const Feedback = ({ text, value }) => {
+const Statistic = ({ text, value }) => {
     return (
         <p>{text} {value}</p>
     )
@@ -66,12 +66,12 @@ const Statistics = (props) => {
     return (
         <>
             <Header text="statistics" />
-            <Feedback text="good" value={good} />
-            <Feedback text="neutral" value={neutral} />
-            <Feedback text="bad" value={bad} />
-            <Feedback text="all" value={totalFeedback()} />
-            <Feedback text="average" value={feedbackAverage()} />
-            <Feedback text="positive" value={positiveFeedback()} />
+            <Statistic text="good" value={good} />
+            <Statistic text="neutral" value={neutral} />
+            <Statistic text="bad" value={bad} />
+            <Statistic text="all" value={totalFeedback()} />
+            <Statistic text="average" value={feedbackAverage()} />
+            <Statistic text="positive" value={positiveFeedback()} />
         </>
     )
 }
