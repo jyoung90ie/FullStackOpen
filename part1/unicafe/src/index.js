@@ -23,6 +23,35 @@ const App = () => {
     const [neutral, setNeutral] = useState(0)
     const [bad, setBad] = useState(0)
 
+    const totalFeedback = () => good + neutral + bad
+
+    const feedbackAverage = () => {
+        // total feedback
+        const total = totalFeedback()
+
+        if (total === 0) {
+            return 0
+        }
+
+        // assigns scores to determine average
+        const goodScore = good * 1
+        const neutralScore = neutral * 0
+        const badScore = bad * -1
+        // calculate average
+        const avgScore = (goodScore + neutralScore + badScore) / total
+
+        return avgScore
+    }
+
+    const positiveFeedback = () => {
+        if (good === 0) {
+            return 0
+        }
+        const total = totalFeedback()
+
+        return (good / total) * 100 + ' %'
+    }
+
 
     return (
         <div>
@@ -34,6 +63,9 @@ const App = () => {
             <Feedback text="good" value={good} />
             <Feedback text="neutral" value={neutral} />
             <Feedback text="bad" value={bad} />
+            <Feedback text="all" value={totalFeedback()} />
+            <Feedback text="average" value={feedbackAverage()} />
+            <Feedback text="positive" value={positiveFeedback()} />
 
         </div>
     )
