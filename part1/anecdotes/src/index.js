@@ -2,8 +2,17 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
 
+const Button = ({ text, func }) => {
+    return (
+        <button onClick={func}>
+            {text}
+        </button>
+    )
+}
+
 const App = (props) => {
     const [selected, setSelected] = useState(0)
+    const [votes, setVotes] = useState([0, 0, 0, 0, 0, 0])
 
     const getRandom = () => {
         // get length of array
@@ -15,14 +24,24 @@ const App = (props) => {
         return randomNumber
     }
 
+    // used to update votes for specified anecdote
+    const updateVotes = () => {
+        // copy the votes array
+        const newVotes = [...votes]
+        // increment specified anecdotes, using state variable, 'selected'
+        newVotes[selected] += 1
+        // set state to newVotes
+        setVotes(newVotes)
+    }
+
     return (
         <div>
             {props.anecdotes[selected]}
             <br />
+            has {votes[selected]} votes
             <br />
-            <button onClick={() => setSelected(getRandom())}>
-                Randomise
-            </button>
+            <Button text="vote" func={() => updateVotes()} />
+            <Button text="next anecdote" func={() => setSelected(getRandom())} />
         </div>
     )
 }
