@@ -10,6 +10,14 @@ const Button = ({ text, func }) => {
     )
 }
 
+const Header = ({ text }) => {
+    return (
+        <h1>
+            {text}
+        </h1>
+    )
+}
+
 const App = (props) => {
     const [selected, setSelected] = useState(0)
     const [votes, setVotes] = useState([0, 0, 0, 0, 0, 0])
@@ -32,16 +40,34 @@ const App = (props) => {
         newVotes[selected] += 1
         // set state to newVotes
         setVotes(newVotes)
+        // test
+        mostVotesAnecdote()
     }
+
+    // return the index of the array value with the most votes
+    const mostVotesAnecdote = () => {
+        // get max value contained in array
+        const maxValue = Math.max(...votes)
+
+        // return the array index of the max value
+        const mostVotesIndex = votes.indexOf(maxValue)
+
+        return mostVotesIndex
+    }
+
+    const indexMostVotes = mostVotesAnecdote()
 
     return (
         <div>
-            {props.anecdotes[selected]}
-            <br />
-            has {votes[selected]} votes
-            <br />
+            <Header text="Anecdote of the day" />
+            {props.anecdotes[selected]}<br />
+            has {votes[selected]} votes<br />
             <Button text="vote" func={() => updateVotes()} />
             <Button text="next anecdote" func={() => setSelected(getRandom())} />
+
+            <Header text="Anecdote with most votes" />
+            {props.anecdotes[indexMostVotes]}<br />
+            has {votes[indexMostVotes]} votes
         </div>
     )
 }
