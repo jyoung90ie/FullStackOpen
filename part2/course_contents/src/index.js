@@ -8,10 +8,11 @@ const Header = ({ course }) => {
 }
 
 const Total = ({ parts }) => {
-    let total = 0
-    // iterate through array and add exercise values to total
-    parts.map(parts => total += parts.exercises)
-    // output result
+    // use map to create new array containing ONLY exercise values
+    // use reduce to sum each value
+    const total = parts.map(parts => +parts.exercises)
+        .reduce((s, p) => s + p)
+
     return (
         <strong>total of {total} exercises</strong>
     )
