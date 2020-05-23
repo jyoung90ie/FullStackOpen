@@ -1,58 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
-const Header = ({ course }) => {
-    return (
-        <h1>{course.name}</h1>
-    )
-}
-
-const Total = ({ parts }) => {
-    // use map to create new array containing ONLY exercise values
-    // use reduce to sum each value
-    const total = parts.map(parts => +parts.exercises)
-        .reduce((s, p) => s + p)
-
-    return (
-        <strong>total of {total} exercises</strong>
-    )
-}
-
-const Part = ({ part }) => {
-    return (
-        <p>
-            {part.name} {part.exercises}
-        </p>
-    )
-}
-
-const Content = ({ parts }) => {
-    return (
-        <div>
-            {parts.map((part) =>
-                <Part key={part.id} part={part} />
-            )}
-        </div>
-    )
-}
-
-const Course = ({ course }) => {
-    return (
-        <div>
-            <Header course={course} />
-            <Content parts={course.parts} />
-            <Total parts={course.parts} />
-        </div>
-    )
-}
+import Course from './components/Course'
 
 const App = () => {
-    const courses = [
-        {
+    const courses = [{
             name: 'Half Stack application development',
             id: 1,
-            parts: [
-                {
+            parts: [{
                     name: 'Fundamentals of React',
                     exercises: 10,
                     id: 1
@@ -77,8 +31,7 @@ const App = () => {
         {
             name: 'Node.js',
             id: 2,
-            parts: [
-                {
+            parts: [{
                     name: 'Routing',
                     exercises: 3,
                     id: 1
@@ -93,14 +46,21 @@ const App = () => {
         }
     ]
 
-    return (
-        <div>
-            {courses.map(course => {
+    return ( <
+        div > {
+            courses.map(course => {
                 console.log(course);
-                return <Course key={course.id} course={course} />
-            })}
-        </div>
+                return <Course key = {
+                    course.id
+                }
+                course = {
+                    course
+                }
+                />
+            })
+        } <
+        /div>
     )
 }
 
-ReactDOM.render(<App />, document.getElementById('root'))
+ReactDOM.render( < App / > , document.getElementById('root'))
