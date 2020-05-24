@@ -1,0 +1,93 @@
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+
+const CountryDetail = ({ country }) => {
+    // display detailed information for a single country
+    return (
+        <>
+            <h1>{country.name}</h1>
+            capital: {country.capital}<br />
+        population: {country.population}<br />
+            <h2>languages</h2>
+            <ul>
+                {country.languages
+                    .map(language => {
+                        return <li key={language.name}>{language.name}</li>
+                    })
+                }
+            </ul>
+            <img src={country.flag} width="150" height="100" alt="country flag" />
+        </>
+    )
+
+}
+
+// display list of countries that match result
+const Countries = ({ countries }) => {
+    const numberOfCountries = countries.length
+    if (numberOfCountries === 1) {
+        // return detailed view if only one country returned
+        return <CountryDetail country={countries[0]} />
+    } else if (numberOfCountries > 10) {
+        return <p>Your search term returned too many results, please be more specific</p>
+    }
+
+    return (
+        <ul>
+            {countries.map(country => {
+                return <li key={country.name}>{country.name}</li>
+            })}
+        </ul>
+    )
+
+}
+
+const App = () => {
+    const [country, setCountry] = useState('')
+    const [countries, setCountries] = useState([])
+    const [searchCountries, setSearchCountries] = useState([])
+
+    // get data from api - this only needs to be run once
+    useEffect(
+        () => {
+            axios
+                .get('https://restcountries.eu/rest/v2/all')
+                .then(response => {
+                    setCountries(response.data)
+                })
+        },
+        []
+    )
+
+    // parse api data and return relevant results
+    useEffect(
+        () => {
+            // filter array values that match country
+            const filteredCountries = countries.filter(result => {
+                // store country in lowercase, want case insenstive search
+                const countryName = result.name.toLowerCase()
+                const searchCountry = country.toLowerCase()
+
+                return countryName.includes(searchCountry)
+            })
+            setSearchCountries(filteredCountries)
+            // with remaining data, return country list
+        },
+        // run each time the country variable changes
+        [country, countries]
+    )
+
+    // when input value changes, update state variable 'country'
+    const handleCountryChange = event => {
+        setCountry(event.target.value)
+    }
+
+    return (
+        <div>
+            find countries <input value={country} onChange={handleCountryChange} />
+            <Countries countries={searchCountries} />
+        </div>
+    )
+}
+
+export default App
