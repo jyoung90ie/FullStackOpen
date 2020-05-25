@@ -23,7 +23,7 @@ const CountryDetail = ({ country }) => {
 }
 
 // display list of countries that match result
-const Countries = ({ countries }) => {
+const Countries = ({ countries, handleButton }) => {
     const numberOfCountries = countries.length
     if (numberOfCountries === 1) {
         // return detailed view if only one country returned
@@ -35,7 +35,12 @@ const Countries = ({ countries }) => {
     return (
         <ul>
             {countries.map(country => {
-                return <li key={country.name}>{country.name}</li>
+                return (
+                    <li key={country.name}>
+                        {country.name}
+                        <button type="button" value={country.name} onClick={handleButton}>show</button>
+                    </li>
+                )
             })}
         </ul>
     )
@@ -85,7 +90,7 @@ const App = () => {
     return (
         <div>
             find countries <input value={country} onChange={handleCountryChange} />
-            <Countries countries={searchCountries} />
+            <Countries countries={searchCountries} handleButton={handleCountryChange} />
         </div>
     )
 }
