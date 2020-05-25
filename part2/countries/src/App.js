@@ -1,6 +1,34 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const WeatherDetail = ({ capitalCity }) => {
+    // create state variables
+    const [weatherData, setWeatherData] = useState({})
+
+    // wrap promise request in useEffect to call only when capitalCity changes
+    useEffect(() => {
+        // get api key from .env file
+        const apiKey = process.env.REACT_APP_WEATHERSTACK_API
+
+        axios
+            .get(`http://api.weatherstack.com/current?access_key=${apiKey}&query=${capitalCity}`)
+            .then(response => {
+
+                // store data in state variable
+                setWeatherData(response.data.current)
+            })
+    }, [capitalCity])
+    // pull weather data from external api for country capital city
+
+
+    return (<>
+        <h2>Weather in {capitalCity}</h2>
+        <strong>temperature:</strong> {weatherData.temperature} Celcius<br />
+        <img src={weatherData.weather_icons} width="100" height="100" alt="weather icon" /><br />
+        <strong>wind:</strong> {weatherData.wind_speed} mph direction {weatherData.wind_dir}
+    </>)
+}
+
 const CountryDetail = ({ country }) => {
     // display detailed information for a single country
     return (
@@ -17,6 +45,7 @@ const CountryDetail = ({ country }) => {
                 }
             </ul>
             <img src={country.flag} width="150" height="100" alt="country flag" />
+            <WeatherDetail capitalCity={country.capital} />
         </>
     )
 
