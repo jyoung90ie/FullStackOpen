@@ -85,11 +85,19 @@ const App = () => {
             name: newName,
             number: newNumber
         }
-        // set persons with new object
-        setPersons(persons.concat(personObject))
-        // reset input value to blank
-        setNewName('')
-        setNewNumber('')
+        // post new personObject to json server, so it is retained
+        axios.post('http://localhost:3001/persons', personObject)
+            .then(response => {
+                // create new persons object which includes new addition
+                // then set this to the persons variable
+                setPersons(persons.concat(response.data))
+                // reset input value to blank
+                setNewName('')
+                setNewNumber('')
+            })
+            .catch(error => {
+                console.log('error occured adding new person object', error)
+            })
     }
 
     // filter array
