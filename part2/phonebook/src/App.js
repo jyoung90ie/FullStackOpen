@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-import personService from './services/persons'
+import personsService from './services/persons'
 
 const Filter = ({ searchTerm, handleSearchChange }) => {
     return (
@@ -27,9 +26,14 @@ const PersonForm = ({ addPerson, newName, newNumber, handleNameChange, handleNum
     )
 }
 
-const Persons = ({ data }) => {
-    return data.map(person =>
-        <div key={person.name}>{person.name} {person.number}</div>)
+const Persons = ({ data, deletePerson }) => {
+    return data.map(person => {
+        return (
+            <div key={person.name}>{person.name} {person.number}
+                <button onClick={() => deletePerson(person.id)}>delete</button>
+            </div>
+        )
+    })
 }
 
 const App = () => {
@@ -41,7 +45,7 @@ const App = () => {
     // get data from server
     useEffect(() => {
         // retrieve data from db and store in persons variable
-        personService.getAll()
+        personsService.getAll()
             .then(data => setPersons(data))
     }, [])
 
@@ -82,13 +86,38 @@ const App = () => {
             number: newNumber
         }
         // post new personObject to json server, so it is retained
-        personService.create(personObject)
+        personsService.create(personObject)
             .then(newPerson => {
                 setPersons(persons.concat(newPerson))
                 // empty input field values
                 setNewName('')
                 setNewNumber('')
             })
+    }
+
+    const deletePerson = (id) => {
+        // find out index by creating array of id's, then searching for id passed through
+        const index = persons.map(person => person.id).indexOf(id)
+        const confirmation = window.confirm(`Do you want to delete ${persons[index].name}?`)
+
+        // if user cancels prompt, do nothing
+        if (!confirmation) {
+            return
+        }
+
+        // send HTTP DELETE request to db, handle errors
+        personsService.remove(id)
+            .then(response => {
+                // make sure that the delete was successful before updating persons variable
+                if (response.status === 200) {
+                    setPersons(persons.filter(person => person.id !== id))
+                }
+            })
+            .catch(error => {
+                alert(`${persons[index].name} was already deleted from the server`)
+                setPersons(persons.filter(person => person.id !== id))
+            })
+
     }
 
     // filter array
@@ -106,7 +135,7 @@ const App = () => {
             <PersonForm addPerson={addPerson} newName={newName}
                 newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
             <h2>Numbers</h2>
-            <Persons data={personsToShow} />
+            <Persons data={personsToShow} deletePerson={deletePerson} />
         </div>
     )
 }

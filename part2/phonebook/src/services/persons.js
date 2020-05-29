@@ -14,4 +14,10 @@ const create = (personObject) => {
         .catch(error => console.log('error adding person', error))
 }
 
-export default { getAll, create }
+const remove = (id) => {
+    return axios.delete(`${baseUrl}/${id}`)
+        .then(response => response)
+        .catch(error => console.log('could not delete person object', error))
+}
+
+export default { getAll, create, remove }
