@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import personService from './services/persons'
 
 const Filter = ({ searchTerm, handleSearchChange }) => {
     return (
@@ -39,14 +40,9 @@ const App = () => {
 
     // get data from server
     useEffect(() => {
-        console.log('effect')
-        axios
-            .get('http://localhost:3001/persons')
-            .then(response => {
-                console.log('promise fulfilled')
-                console.log(response)
-                setPersons(response.data)
-            })
+        // retrieve data from db and store in persons variable
+        personService.getAll()
+            .then(data => setPersons(data))
     }, [])
 
     const handleNameChange = (event) => {
@@ -86,17 +82,12 @@ const App = () => {
             number: newNumber
         }
         // post new personObject to json server, so it is retained
-        axios.post('http://localhost:3001/persons', personObject)
-            .then(response => {
-                // create new persons object which includes new addition
-                // then set this to the persons variable
-                setPersons(persons.concat(response.data))
-                // reset input value to blank
+        personService.create(personObject)
+            .then(newPerson => {
+                setPersons(persons.concat(newPerson))
+                // empty input field values
                 setNewName('')
                 setNewNumber('')
-            })
-            .catch(error => {
-                console.log('error occured adding new person object', error)
             })
     }
 
