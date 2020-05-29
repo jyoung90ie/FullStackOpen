@@ -77,15 +77,49 @@ const App = () => {
         const nameLowerCase = newName.toLowerCase()
 
         if (listOfNames.includes(nameLowerCase)) {
-            alert(`${newName} is already added to the phonebook`)
+            const confirmation = window.confirm(`${newName} is already part of the phonebook. Would you like to replace the existing number with a the one provided?`)
+
+            // if user selects cancel, then stop 
+            if (!confirmation) {
+                return
+            }
+            // get existing person object
+            const existingObject = persons.filter(person => {
+                return person.name.toLowerCase() === nameLowerCase
+            })[0]
+
+            // store id of personObject to be updated
+            const id = existingObject.id
+
+            // create new object for this person which has updated number
+            const newObject = {
+                ...existingObject,
+                number: newNumber
+            }
+
+            // send PUT request to update db
+            personsService.update(id, newObject)
+                .then(updatedPerson => {
+                    // update was successful, take response data and update state variable
+                    const updatedPersons = persons.map(person =>
+                        person.id === id ? updatedPerson : person)
+                    setPersons(updatedPersons)
+
+                    // reset form inputs
+                    setNewName('')
+                    setNewNumber('')
+                })
+            // prevent application from executing any further
             return
         }
 
+        // create object with user inputs for creating new db entry
         const personObject = {
             name: newName,
             number: newNumber
         }
-        // post new personObject to json server, so it is retained
+
+        // sendPOST request to db, so user data is retained across sessions
         personsService.create(personObject)
             .then(newPerson => {
                 setPersons(persons.concat(newPerson))

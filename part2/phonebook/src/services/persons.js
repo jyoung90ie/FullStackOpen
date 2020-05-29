@@ -20,4 +20,10 @@ const remove = (id) => {
         .catch(error => console.log('could not delete person object', error))
 }
 
-export default { getAll, create, remove }
+const update = (id, personObject) => {
+    return axios.patch(`${baseUrl}/${id}`, personObject)
+        .then(response => response.data)
+        .catch(error => console.log('could not update phone number for person object', error))
+}
+
+export default { getAll, create, remove, update }
