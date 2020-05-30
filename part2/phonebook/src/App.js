@@ -36,11 +36,26 @@ const Persons = ({ data, deletePerson }) => {
     })
 }
 
+// provide interactive messages to the user to confirm actions have been completed
+const Feedback = ({ message }) => {
+    // if no message is passed through then do not output html
+    if (message === null) {
+        return null
+    }
+
+    return (
+        <div className='feedback'>
+            {message}
+        </div>
+    )
+}
+
 const App = () => {
     const [persons, setPersons] = useState([])
     const [newName, setNewName] = useState('')
     const [newNumber, setNewNumber] = useState('')
     const [searchTerm, setSearchTerm] = useState('')
+    const [feedbackMessage, setFeedbackMessage] = useState(null)
 
     // get data from server
     useEffect(() => {
@@ -68,7 +83,7 @@ const App = () => {
         // check that both name and number are populated
         if (newName === '' || newNumber === '') {
             alert('You must provide values for name and number')
-            return
+            return null
         }
 
         // check that the name is not already in the list
@@ -81,7 +96,7 @@ const App = () => {
 
             // if user selects cancel, then stop 
             if (!confirmation) {
-                return
+                return null
             }
             // get existing person object
             const existingObject = persons.filter(person => {
@@ -105,12 +120,19 @@ const App = () => {
                         person.id === id ? updatedPerson : person)
                     setPersons(updatedPersons)
 
+                    // add message to inform user the update was successful
+                    setFeedbackMessage(`Phone number for ${updatedPerson.name} has been updated.`)
+                    // set variable to null after X seconds
+                    setTimeout(() => setFeedbackMessage(null), 5000)
+
                     // reset form inputs
                     setNewName('')
                     setNewNumber('')
                 })
+
+
             // prevent application from executing any further
-            return
+            return null
         }
 
         // create object with user inputs for creating new db entry
@@ -123,6 +145,12 @@ const App = () => {
         personsService.create(personObject)
             .then(newPerson => {
                 setPersons(persons.concat(newPerson))
+
+                // add message to inform user the update was successful
+                setFeedbackMessage(`Added new entry for ${personObject.name}`)
+                // set variable to null after X seconds
+                setTimeout(() => setFeedbackMessage(null), 5000)
+
                 // empty input field values
                 setNewName('')
                 setNewNumber('')
@@ -136,7 +164,7 @@ const App = () => {
 
         // if user cancels prompt, do nothing
         if (!confirmation) {
-            return
+            return null
         }
 
         // send HTTP DELETE request to db, handle errors
@@ -163,7 +191,8 @@ const App = () => {
 
     return (
         <div>
-            <h2>Phonebook</h2>
+            <h1>Phonebook</h1>
+            <Feedback message={feedbackMessage} />
             <Filter searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
             <h2>add a new</h2>
             <PersonForm addPerson={addPerson} newName={newName}
