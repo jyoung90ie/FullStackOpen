@@ -37,14 +37,16 @@ const Persons = ({ data, deletePerson }) => {
 }
 
 // provide interactive messages to the user to confirm actions have been completed
-const Feedback = ({ message }) => {
+const Messages = ({ message, type }) => {
     // if no message is passed through then do not output html
     if (message === null) {
         return null
     }
+    // list of css classes to be applied
+    const classes = `messages ${type}`
 
     return (
-        <div className='feedback'>
+        <div className={classes}>
             {message}
         </div>
     )
@@ -55,7 +57,8 @@ const App = () => {
     const [newName, setNewName] = useState('')
     const [newNumber, setNewNumber] = useState('')
     const [searchTerm, setSearchTerm] = useState('')
-    const [feedbackMessage, setFeedbackMessage] = useState(null)
+    const [messages, setMessages] = useState(null)
+    const [errors, setErrors] = useState(null)
 
     // get data from server
     useEffect(() => {
@@ -74,6 +77,16 @@ const App = () => {
 
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value)
+    }
+
+    const handleSetMessages = (message) => {
+        setMessages(message)
+        setTimeout(() => setMessages(null), 5000)
+    }
+
+    const handleSetErrors = (message) => {
+        setErrors(message)
+        setTimeout(() => setErrors(null), 5000)
     }
 
     const addPerson = (event) => {
@@ -121,13 +134,15 @@ const App = () => {
                     setPersons(updatedPersons)
 
                     // add message to inform user the update was successful
-                    setFeedbackMessage(`Phone number for ${updatedPerson.name} has been updated.`)
-                    // set variable to null after X seconds
-                    setTimeout(() => setFeedbackMessage(null), 5000)
+                    handleSetMessages(`Phone number for ${updatedPerson.name} has been updated.`)
 
                     // reset form inputs
                     setNewName('')
                     setNewNumber('')
+                })
+                .catch(error => {
+                    handleSetErrors(`Could not update the entry for ${existingObject.name} as it has been removed from the server.`)
+                    setPersons(persons.filter(person => person.id !== id))
                 })
 
 
@@ -147,9 +162,7 @@ const App = () => {
                 setPersons(persons.concat(newPerson))
 
                 // add message to inform user the update was successful
-                setFeedbackMessage(`Added new entry for ${personObject.name}`)
-                // set variable to null after X seconds
-                setTimeout(() => setFeedbackMessage(null), 5000)
+                handleSetMessages(`Added new entry for ${personObject.name}`)
 
                 // empty input field values
                 setNewName('')
@@ -173,10 +186,11 @@ const App = () => {
                 // make sure that the delete was successful before updating persons variable
                 if (response.status === 200) {
                     setPersons(persons.filter(person => person.id !== id))
+                    handleSetMessages(`Information for ${persons[index].name} has been removed from the server.`)
                 }
             })
             .catch(error => {
-                alert(`${persons[index].name} was already deleted from the server`)
+                handleSetErrors(`The entry for ${persons[index].name} has already been removed from the server.`)
                 setPersons(persons.filter(person => person.id !== id))
             })
 
@@ -192,7 +206,8 @@ const App = () => {
     return (
         <div>
             <h1>Phonebook</h1>
-            <Feedback message={feedbackMessage} />
+            <Messages message={errors} type='error' />
+            <Messages message={messages} type='feedback' />
             <Filter searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
             <h2>add a new</h2>
             <PersonForm addPerson={addPerson} newName={newName}
