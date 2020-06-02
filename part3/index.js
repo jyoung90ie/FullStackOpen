@@ -84,7 +84,6 @@ const generateId = () => {
 
 // add new entries to persons object
 app.post('/api/persons', (request, response) => {
-    console.log(request)
     const body = request.body
 
     // check that user submitted data
@@ -93,6 +92,19 @@ app.post('/api/persons', (request, response) => {
             error: 'content missing'
         })
     }
+
+    // check that name does not already exist
+    const findPerson = persons.find(person => {
+        return person.name.toLowerCase() === body.name.toLowerCase()
+    })
+
+    if (findPerson) {
+        // name already exists, raise error
+        return response.status('400').json({
+            error: 'name must be unique'
+        })
+    }
+
     // construct person object
     const person = {
         name: body.name,
