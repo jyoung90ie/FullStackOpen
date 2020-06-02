@@ -36,6 +36,18 @@ app.get('/api/persons', (request, response) => {
     response.json(persons)
 })
 
+app.get('/info', (request, response) => {
+    // get the date and convert to a text string
+    const date = new Date().toString()
+    // get the number of entries in the persons object
+    const personsCount = Object.keys(persons).length
+
+    const content = `Phonebook has info for ${personsCount} people
+    <br><br>${date}`
+
+    response.send(content)
+})
+
 const PORT = 3001
 
 app.listen(PORT)
