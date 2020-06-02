@@ -40,7 +40,6 @@ app.get('/api/persons', (request, response) => {
 
 // display detail view for a single person within the persons object
 app.get('/api/persons/:id', (request, response) => {
-
     // get id from http request headers, convert to number
     const id = Number(request.params.id)
     // check that id exists within the persons object
@@ -72,6 +71,38 @@ app.delete('/api/persons/:id', (request, response) => {
         // return 404 (not found)
         response.status(404).end()
     }
+})
+
+// create an id for new entries in the persons object
+const generateId = () => {
+    const maxId = persons.length > 0
+        ? Math.max(...persons.map(person => person.id))
+        : 0
+
+    return maxId + 1
+}
+
+// add new entries to persons object
+app.post('/api/persons', (request, response) => {
+    console.log(request)
+    const body = request.body
+
+    // check that user submitted data
+    if (!body.name || !body.number) {
+        return response.status('400').json({
+            error: 'content missing'
+        })
+    }
+    // construct person object
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: generateId(),
+    }
+    // add new person to existing persons object
+    persons = persons.concat(person)
+    // present the new persons object
+    response.json(persons)
 })
 
 // display information relating to persons object
