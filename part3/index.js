@@ -1,8 +1,15 @@
 const express = require('express')
+const morgan = require('morgan')
+
 const app = express()
+
+// activate http request logger
+app.use(morgan('tiny'))
 
 // activate json parser
 app.use(express.json())
+
+
 
 // get phonebook entries from part 2
 let persons = [
