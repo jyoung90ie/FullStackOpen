@@ -3,12 +3,14 @@ const morgan = require('morgan')
 
 const app = express()
 
-// activate http request logger
-app.use(morgan('tiny'))
-
 // activate json parser
 app.use(express.json())
 
+// create custom token for logger
+morgan.token('body', (request, response) => JSON.stringify(request.body))
+
+// activate http request logger
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 
 // get phonebook entries from part 2
