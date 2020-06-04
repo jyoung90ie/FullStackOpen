@@ -184,10 +184,8 @@ const App = () => {
         personsService.remove(id)
             .then(response => {
                 // make sure that the delete was successful before updating persons variable
-                if (response.status === 200) {
-                    setPersons(persons.filter(person => person.id !== id))
-                    handleSetMessages(`Information for ${persons[index].name} has been removed from the server.`)
-                }
+                setPersons(persons.filter(person => person.id !== id))
+                handleSetMessages(`Information for ${persons[index].name} has been removed from the server.`)
             })
             .catch(error => {
                 handleSetErrors(`The entry for ${persons[index].name} has already been removed from the server.`)

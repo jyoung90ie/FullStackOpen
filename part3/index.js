@@ -1,10 +1,14 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 
 const app = express()
 
 // activate json parser
 app.use(express.json())
+
+// enable cross origin resource sharing
+app.use(cors())
 
 // create custom token for logger
 morgan.token('body', (request, response) => JSON.stringify(request.body))
@@ -122,8 +126,8 @@ app.post('/api/persons', (request, response) => {
     }
     // add new person to existing persons object
     persons = persons.concat(person)
-    // present the new persons object
-    response.json(persons)
+    // return ONLY the new person, which is concatenated to existing object
+    response.json(person)
 })
 
 // display information relating to persons object
