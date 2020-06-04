@@ -1,5 +1,5 @@
 # Succesful entry
-POST http://localhost:3001/api/persons/
+POST https://fathomless-earth-59211.herokuapp.com/api/persons
 Content-Type: application/json
 
 {
