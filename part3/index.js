@@ -7,6 +7,9 @@ const app = express()
 // activate json parser
 app.use(express.json())
 
+// serve static files from build
+app.use(express.static('build'))
+
 // enable cross origin resource sharing
 app.use(cors())
 
