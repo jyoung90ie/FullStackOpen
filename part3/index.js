@@ -1,8 +1,14 @@
+// import environment variables
+require('dotenv').config()
+
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 
 const app = express()
+
+// MongoDB
+const Person = require('./models/person.js')
 
 // activate json parser
 app.use(express.json())
@@ -51,24 +57,18 @@ app.get('/', (request, response) => {
 
 // return full persons object
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find({})
+        .then(persons => {
+            response.json(persons)
+        })
 })
 
 // display detail view for a single person within the persons object
 app.get('/api/persons/:id', (request, response) => {
-    // get id from http request headers, convert to number
-    const id = Number(request.params.id)
-    // check that id exists within the persons object
-    const person = persons.find(person => person.id === id)
-
-    // check that id exists, otherwise return 404
-    if (person) {
-        // display contents 
-        response.json(person)
-    } else {
-        // return 404 (not found)
-        response.status(404).end()
-    }
+    Person.findById(request.params.id)
+        .then(person => {
+            response.json(person)
+        })
 })
 
 // delete entry from persons object
@@ -109,28 +109,19 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    // check that name does not already exist
-    const findPerson = persons.find(person => {
-        return person.name.toLowerCase() === body.name.toLowerCase()
-    })
-
-    if (findPerson) {
-        // name already exists, raise error
-        return response.status('400').json({
-            error: 'name must be unique'
-        })
-    }
-
-    // construct person object
-    const person = {
+    // create new person object for saving
+    const person = new Person({
         name: body.name,
         number: body.number,
-        id: generateId(),
-    }
-    // add new person to existing persons object
-    persons = persons.concat(person)
-    // return ONLY the new person, which is concatenated to existing object
-    response.json(person)
+    })
+
+    // save to DB
+    person.save()
+        .then(savedPerson => {
+            response.json(savedPerson)
+            console.log('Person added to DB', savedPerson)
+        })
+
 })
 
 // display information relating to persons object
