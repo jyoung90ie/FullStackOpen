@@ -73,30 +73,11 @@ app.get('/api/persons/:id', (request, response) => {
 
 // delete entry from persons object
 app.delete('/api/persons/:id', (request, response) => {
-    // get id from http request headers, convert to number
-    const id = Number(request.params.id)
-    // check that id exists within the persons object
-    const person = persons.find(person => person.id === id)
-
-    // check that id exists, otherwise return 404
-    if (person) {
-        // remove the entry and return 204 (Successful, no content required)
-        persons = persons.filter(person => person.id !== id)
-        response.status(204).end()
-    } else {
-        // return 404 (not found)
-        response.status(404).end()
-    }
+    Person.findByIdAndRemove(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
 })
-
-// create an id for new entries in the persons object
-const generateId = () => {
-    const maxId = persons.length > 0
-        ? Math.max(...persons.map(person => person.id))
-        : 0
-
-    return maxId + 1
-}
 
 // add new entries to persons object
 app.post('/api/persons', (request, response) => {
