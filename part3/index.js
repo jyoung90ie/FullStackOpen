@@ -25,62 +25,40 @@ morgan.token('body', (request, response) => JSON.stringify(request.body))
 // activate http request logger
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-
-// get phonebook entries from part 2
-let persons = [
-    {
-        "name": "Ada Lovelace",
-        "number": "123123",
-        "id": 2
-    },
-    {
-        "name": "Dan Abramov",
-        "number": "12-43-234345",
-        "id": 3
-    },
-    {
-        "name": "Test",
-        "number": "999-999-9999",
-        "id": 4
-    },
-    {
-        "name": "John",
-        "number": "123-456-6788",
-        "id": 5
-    }
-]
-
 // homepage
 app.get('/', (request, response) => {
     response.send('<h1>Phonebook</h1>')
 })
 
 // return full persons object
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
     Person.find({})
         .then(persons => {
             response.json(persons)
         })
+        .catch(error => next(error))
 })
 
 // display detail view for a single person within the persons object
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id)
         .then(person => {
             response.json(person)
         })
+        .catch(error => next(error))
 })
 
 // delete entry from persons object
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndRemove(request.params.id)
         .then(result => {
             response.status(204).end()
         })
+        .catch(error => next(error))
 })
 
 // add new entries to persons object
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
 
     // check that user submitted data
@@ -102,11 +80,12 @@ app.post('/api/persons', (request, response) => {
             response.json(savedPerson)
             console.log('Person added to DB', savedPerson)
         })
+        .catch(error => next(error))
 
 })
 
 // display information relating to persons object
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
     // get the date and convert to a text string
     const date = new Date().toString()
     // get the number of entries in the persons object
@@ -119,8 +98,25 @@ app.get('/info', (request, response) => {
 
             response.send(content)
         })
+        .catch(error => next(error))
 })
 
+
+// error handling middleware
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'Invalid ID format' })
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
+
+
+// app runtime configuration
 const PORT = process.env.PORT || 3001
 
 app.listen(PORT, () => {
