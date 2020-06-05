@@ -63,9 +63,7 @@ app.post('/api/persons', (request, response, next) => {
 
     // check that user submitted data
     if (!body.name || !body.number) {
-        return response.status('400').json({
-            error: 'content missing'
-        })
+        return response.status(400).send({ error: 'content missing' })
     }
 
     // create new person object for saving
@@ -82,6 +80,26 @@ app.post('/api/persons', (request, response, next) => {
         })
         .catch(error => next(error))
 
+})
+
+// used to update phone numbers for existing entries
+app.patch('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+
+    if (!body.number) {
+        return response.status(400).send({ error: 'number missing' })
+    }
+
+    const person = {
+        number: body.number
+    }
+
+    // send update to DB
+    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+        .then(updatedPerson => {
+            response.json(updatedPerson)
+        })
+        .catch(error => next(error))
 })
 
 // display information relating to persons object
