@@ -1,6 +1,9 @@
 const mongoose = require('mongoose')
+const uniqueValidator = require('mongoose-unique-validator')
 
+// set vars to resolve depreciation warnings
 mongoose.set('useFindAndModify', false)
+mongoose.set('useCreateIndex', true)
 
 // connect to MongoDB
 const url = process.env.MONGODB_URI
@@ -15,9 +18,19 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
 
 // setup person schema
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
+    name: {
+        type: String,
+        required: true,
+        unique: true,
+        uniqueCaseInsensitive: true
+    },
+    number: {
+        type: String,
+        required: true
+    },
 })
+// apply uniqueValidator plugin to schema
+personSchema.plugin(uniqueValidator)
 
 // modify response from MongoDB
 personSchema.set('toJSON', {
