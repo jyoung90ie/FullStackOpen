@@ -141,8 +141,11 @@ const App = () => {
                     setNewNumber('')
                 })
                 .catch(error => {
-                    handleSetErrors(`Could not update the entry for ${existingObject.name} as it has been removed from the server.`)
-                    setPersons(persons.filter(person => person.id !== id))
+                    // handleSetErrors(`Could not update the entry for ${existingObject.name} as it has been removed from the server.`)
+                    // setPersons(persons.filter(person => person.id !== id))
+
+                    // errors are handled by backend, return error message only
+                    handleSetErrors(error.response.data.error)
                 })
 
 
@@ -167,6 +170,11 @@ const App = () => {
                 // empty input field values
                 setNewName('')
                 setNewNumber('')
+            })
+            .catch(error => {
+                // error is sent back as part of error.response.data
+                // custom ValidationError is added to the end via '.error'
+                handleSetErrors(error.response.data.error)
             })
     }
 

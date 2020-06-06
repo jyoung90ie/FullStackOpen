@@ -22,11 +22,13 @@ const personSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        uniqueCaseInsensitive: true
+        uniqueCaseInsensitive: true,
+        minlength: 3
     },
     number: {
         type: String,
-        required: true
+        required: true,
+        minlength: 8,
     },
 })
 // apply uniqueValidator plugin to schema

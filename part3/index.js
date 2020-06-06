@@ -94,8 +94,13 @@ app.patch('/api/persons/:id', (request, response, next) => {
         number: body.number
     }
 
+    const updateOptions = {
+        new: true,              // true = return the updated object
+        runValidators: true     // enable schema validators for updates
+    }
+
     // send update to DB
-    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    Person.findByIdAndUpdate(request.params.id, person, updateOptions)
         .then(updatedPerson => {
             response.json(updatedPerson)
         })
@@ -126,6 +131,8 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'Invalid ID format' })
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
 
     next(error)
