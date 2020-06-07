@@ -20,13 +20,14 @@ app.use(express.static('build'))
 app.use(cors())
 
 // create custom token for logger
-morgan.token('body', (request, response) => JSON.stringify(request.body))
+morgan.token('body', (request) => JSON.stringify(request.body))
 
 // activate http request logger
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 // homepage
 app.get('/', (request, response) => {
+    console.log(request)
     response.send('<h1>Phonebook</h1>')
 })
 
@@ -51,7 +52,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 // delete entry from persons object
 app.delete('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndRemove(request.params.id)
-        .then(result => {
+        .then(() => {
             response.status(204).end()
         })
         .catch(error => next(error))

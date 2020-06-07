@@ -20,7 +20,7 @@ const personSchema = new mongoose.Schema({
 // initialise mongoose model
 const Person = new mongoose.model('Person', personSchema)
 
-if (process.argv.length == 3) {
+if (process.argv.length === 3) {
     // if only password is provided, return list of phonebook entries
     console.log('---Show all entries in phonebook---')
     Person
@@ -45,7 +45,7 @@ if (process.argv.length == 3) {
         number: number,
     })
 
-    person.save().then(result => {
+    person.save().then(() => {
         console.log('---New entry added to the Phonebook DB---')
         mongoose.connection.close()
     })
