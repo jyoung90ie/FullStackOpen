@@ -225,3 +225,109 @@ describe('author with most blogs', () => {
         expect(result).toEqual(expectedResult)
     })
 })
+
+
+describe('author with most likes', () => {
+    test('no blogs', () => {
+        const result = listHelper.mostLikes([])
+
+        expect(result).toEqual([])
+    })
+
+
+    test('multiple blog posts, all different authors', () => {
+        // objects all have different authors
+        const blogs = [
+            {
+                _id: '5a422aa71b54a676234d17f8',
+                title: 'Another Wonderful Post',
+                author: 'Stan',
+                url: 'http://www.dummy.url/SomeWhere/1/',
+                likes: 7,
+                __v: 0
+            },
+            {
+                _id: '5a420aa71b64a676234d17f3',
+                title: 'Did I really just do that?',
+                author: 'That Met',
+                url: 'http://www.dummy.url/SomeWhere/2/',
+                likes: 3,
+                __v: 0
+            },
+            {
+                _id: '5a412aa71b24a676234d17f5',
+                title: 'Sometimes is all the times',
+                author: 'The Man',
+                url: 'http://www.dummy.url/SomeWhere/3/',
+                likes: 11,
+                __v: 0
+            },
+        ]
+        const result = listHelper.mostLikes(blogs)
+        const expectedResult = [{ author: 'The Man', likes: 11 }]
+
+        expect(result).toEqual(expectedResult)
+    })
+
+
+
+    test('multiple blog posts, all different authors', () => {
+        // two objects share the same author
+        const blogs = [
+            {
+                _id: '5a422aa71b54a676234d17f8',
+                title: 'Another Wonderful Post',
+                author: 'Stan',
+                url: 'http://www.dummy.url/SomeWhere/1/',
+                likes: 7,
+                __v: 0
+            },
+            {
+                _id: '5a420aa71b64a676234d17f3',
+                title: 'Did I really just do that?',
+                author: 'Stan',
+                url: 'http://www.dummy.url/SomeWhere/2/',
+                likes: 3,
+                __v: 0
+            },
+            {
+                _id: '5a412aa71b24a676234d17f5',
+                title: 'Sometimes is all the times',
+                author: 'The Man',
+                url: 'http://www.dummy.url/SomeWhere/3/',
+                likes: 11,
+                __v: 0
+            },
+            {
+                _id: '5a420av71b64a676234d17f3',
+                title: 'Did I really just do that?',
+                author: 'Stan',
+                url: 'http://www.dummy.url/SomeWhere/2/',
+                likes: 1,
+                __v: 0
+            },
+            {
+                _id: '5a412aa71b24a676234d17f5',
+                title: 'Sometimes is all the times',
+                author: 'The Man',
+                url: 'http://www.dummy.url/SomeWhere/3/',
+                likes: 7,
+                __v: 0
+            },
+            {
+                _id: '5a412aa71b24a676234d17f5',
+                title: 'Sometimes is all the times',
+                author: 'New Man',
+                url: 'http://www.dummy.url/SomeWhere/3/',
+                likes: 11,
+                __v: 0
+            },
+        ]
+
+        const result = listHelper.mostLikes(blogs)
+
+        const expectedResult = [{ author: 'The Man', likes: 18 }]
+
+        expect(result).toEqual(expectedResult)
+    })
+})

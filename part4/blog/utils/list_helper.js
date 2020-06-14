@@ -31,19 +31,18 @@ const favoriteBlog = (blogs) => {
 const mostBlogs = (blogs) => {
     // returns the author with the most blogs
 
-    // loop through blogs and return new array with only the authors
-    const authors = blogs.map(blog => blog.author)
     // name of object property that stores the max number of blogs
     // this is used to determine the author with the most blogs
     const maxValueName = 'mostBlogs'
 
     // loop through authors and count how many blogs they have, then push to authorsBlog
     const blogCount = (authors, author) => {
-        authors[author] = (authors[author] || 0) + 1
+        const name = author['author']
+        authors[name] = (authors[name] || 0) + 1
         // get max blog posts and store it as property of object
         authors[maxValueName] = Math.max(
             (authors[maxValueName] || 0), // return previous value or zero if it doesn't exist
-            authors[author] // current value
+            authors[name] // current value
         )
 
         return authors
@@ -51,10 +50,10 @@ const mostBlogs = (blogs) => {
 
     // create object containing authors and number of blogs
     // output: { author: blogs, author: blogs, ..., maxValueName: Max(blogs)}
-    const authorBlogsObj = authors.reduce(blogCount, {})
+    const authorBlogsObj = blogs.reduce(blogCount, {})
 
     // return array which contains an object for the author with most blogs 
-    const authorBlogs = Object.keys(authorBlogsObj)
+    const authorMostBlogs = Object.keys(authorBlogsObj)
         // only return object that contains author with most blogs
         .filter(key => {
             return (
@@ -72,12 +71,55 @@ const mostBlogs = (blogs) => {
             }
         })
 
-    return authorBlogs
+    return authorMostBlogs
+}
+
+const mostLikes = (blogs) => {
+    // returns the author whose blog posts have the most likes
+    const maxValueName = 'mostLikes'
+
+    const totalLikes = (authors, author) => {
+        const name = author['author']
+        authors[name] = (authors[name] || 0) + author.likes
+        // get max blog posts and store it as property of object
+        authors[maxValueName] = Math.max(
+            (authors[maxValueName] || 0), // return previous value or zero if it doesn't exist
+            authors[name] // current value
+        )
+
+        return authors
+    }
+
+    // create object containing authors and total blog likes per author
+    // output: { author: totalLikes, author: totalLikes, ..., maxValueName: Max(totalLikes)}
+    const authorLikesObj = blogs.reduce(totalLikes, {})
+
+    // return array which contains an object for the author with most likes 
+    const authorMostLikes = Object.keys(authorLikesObj)
+        // only return object that contains author with the highest total likes across all blog posts
+        .filter(key => {
+            return (
+                // only return key-pair for author with most likes
+                authorLikesObj[key] === authorLikesObj[maxValueName]
+                &&
+                // do not return the key-pair which stores the max likes value
+                key !== maxValueName
+            )
+        })
+        .map(key => {
+            return {
+                author: key,
+                likes: authorLikesObj[key]
+            }
+        })
+
+    return authorMostLikes
 }
 
 module.exports = {
     dummy,
     totalLikes,
     favoriteBlog,
-    mostBlogs
+    mostBlogs,
+    mostLikes
 }
