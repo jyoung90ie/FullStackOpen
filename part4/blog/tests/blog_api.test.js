@@ -72,6 +72,19 @@ test('api POST request adds new blogs to the database', async () => {
 
 })
 
+test('creating blog without likes property should return likes with a value of 0', async () => {
+    const blog = {
+        title: 'I love posting blogs',
+        author: 'Some Man',
+        url: 'http://www.google.ie/',
+    }
+
+    const newBlog = new Blog(blog)
+    await newBlog.save()
+
+    expect(newBlog).toMatchObject({ likes: 0 })
+})
+
 
 afterAll(() => {
     mongoose.connection.close()
