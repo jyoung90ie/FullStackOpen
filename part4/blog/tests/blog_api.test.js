@@ -96,6 +96,20 @@ test('attempting to create a blog without title or url will result in a 400 requ
         .expect(400)
 })
 
+test('delete a single blog', async () => {
+    const blogsAtStart = await Blog.find({})
+    const blogToDelete = blogsAtStart[0].toJSON()
+
+    await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(204)
+
+    const response = await api.get('/api/blogs')
+
+    expect(response.body).toHaveLength(initialBlogs.length - 1)
+    expect(response.body).not.toMatchObject(blogToDelete)
+})
+
 
 afterAll(() => {
     mongoose.connection.close()
