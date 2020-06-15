@@ -85,6 +85,17 @@ test('creating blog without likes property should return likes with a value of 0
     expect(newBlog).toMatchObject({ likes: 0 })
 })
 
+test('attempting to create a blog without title or url will result in a 400 request', async () => {
+    const blog = {
+        author: 'Some Man',
+        likes: 1
+    }
+
+    await api.post('/api/blogs')
+        .send(blog)
+        .expect(400)
+})
+
 
 afterAll(() => {
     mongoose.connection.close()
