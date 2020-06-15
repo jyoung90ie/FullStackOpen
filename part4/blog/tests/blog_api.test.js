@@ -110,6 +110,25 @@ test('delete a single blog', async () => {
     expect(response.body).not.toMatchObject(blogToDelete)
 })
 
+test('updated a single blog', async () => {
+    const blogsAtStart = await Blog.find({})
+    const blogToUpdate = blogsAtStart[0].toJSON()
+
+    const updatedContents = {
+        title: 'Updated title',
+        author: 'Not the same',
+        url: 'http://thischange.to'
+    }
+
+    const updatedBlog = await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updatedContents)
+        .expect(200)
+
+    const response = await api.get('/api/blogs')
+    expect(response.body).toContainEqual(updatedBlog.body)
+})
+
 
 afterAll(() => {
     mongoose.connection.close()
