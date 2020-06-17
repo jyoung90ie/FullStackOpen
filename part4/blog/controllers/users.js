@@ -35,18 +35,18 @@ usersRouter.post('/', async (request, response) => {
         passwordHash
     })
 
-    try {
+    // try {
 
-        const savedUser = await user.save()
-        response.json(savedUser)
-    } catch (exception) {
-        if (exception.name === 'ValidationError') {
-            return response
-                .status(400)
-                .json({ error: exception.message })
-        }
-        console.error(exception)
-    }
+    const savedUser = await user.save()
+    response.json(savedUser)
+    // } catch (exception) {
+    //     if (exception.name === 'ValidationError') {
+    //         return response
+    //             .status(400)
+    //             .json({ error: exception.message })
+    //     }
+    //     console.error(exception)
+    // }
 })
 
 
