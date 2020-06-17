@@ -3,7 +3,7 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "title": "Second blog post",
+    "title": "Did you hear about the big strong man?",
     "author": "John",
     "url": "second-blog-post",
     "likes": 9
