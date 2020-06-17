@@ -1,0 +1,9 @@
+# Succesful entry
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+    "username": "jayday",
+    "name": "Jonathan Day",
+    "password": "jaydaybay"
+}

@@ -4,6 +4,7 @@
     "description": "Application for blog posts",
     "main": "index.js",
     "dependencies": {
+        "bcrypt": "^5.0.0",
         "cors": "^2.8.5",
         "cross-env": "^7.0.2",
         "dotenv": "^8.2.0",
