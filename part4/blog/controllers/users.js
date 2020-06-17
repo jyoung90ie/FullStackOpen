@@ -9,6 +9,21 @@ usersRouter.get('/', async (request, response) => {
 
 usersRouter.post('/', async (request, response) => {
     const body = request.body
+
+
+    // perform validation
+    if (body.username === undefined || body.password === undefined) {
+        return response
+            .status(400)
+            .json({ error: 'username and password fields are required' })
+    }
+
+    if (body.username.length < 3 || body.password.length < 3) {
+        return response
+            .status(400)
+            .json({ error: 'username and password must contain at least 3 characters' })
+    }
+
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(body.password, saltRounds)
 
@@ -18,8 +33,18 @@ usersRouter.post('/', async (request, response) => {
         passwordHash
     })
 
-    const savedUser = await user.save()
-    response.json(savedUser)
+    try {
+
+        const savedUser = await user.save()
+        response.json(savedUser)
+    } catch (exception) {
+        if (exception.name === 'ValidationError') {
+            return response
+                .status(400)
+                .json({ error: exception.message })
+        }
+        console.error(exception)
+    }
 })
 
 module.exports = usersRouter

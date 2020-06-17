@@ -3,7 +3,8 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
-const { initialNotes } = require('../../../.working/wpart4/notes/tests/test_helper')
+const User = require('../models/user')
+const helper = require('./test_helper')
 
 const initialBlogs = [
     {
@@ -127,6 +128,146 @@ test('updated a single blog', async () => {
 
     const response = await api.get('/api/blogs')
     expect(response.body).toContainEqual(updatedBlog.body)
+})
+
+describe('create user', () => {
+
+    beforeEach(async () => {
+        // empty table and create dummy
+        await User.deleteMany({})
+
+        const user = User({
+            username: 'test_user',
+            name: 'Successful User',
+            passwordHash: 'password_hash213'
+        })
+
+        await user.save()
+    })
+
+    test('valid inputs, should be successful', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const user = {
+            username: 'test_account',
+            password: 'verySecurePass123!',
+            name: 'Successful User'
+        }
+
+        await api
+            .post('/api/users')
+            .send(user)
+            .expect(200)
+
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+    })
+
+    test('no username, should be unsuccessful', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const user = {
+            password: 'verySecurePass123!',
+            name: 'Successful User'
+        }
+
+        const response = await api
+            .post('/api/users')
+            .send(user)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        expect(response.body.error).toContain('username and password fields are required')
+
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+    })
+
+    test('no password, should be unsuccessful', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const user = {
+            username: 'asdasdasd',
+            name: 'Successful User'
+        }
+
+        const response = await api
+            .post('/api/users')
+            .send(user)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        expect(response.body.error).toContain('username and password fields are required')
+
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+    })
+
+    test('username is too short, should be unsuccessful', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const user = {
+            username: '12',
+            name: 'Successful User',
+            password: 'this_is_valid'
+        }
+
+        const response = await api
+            .post('/api/users')
+            .send(user)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        expect(response.body.error)
+            .toContain('username and password must contain at least 3 characters')
+
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+    })
+
+    test('password is too short, should be unsuccessful', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const user = {
+            username: 'test_user',
+            name: 'Successful User',
+            password: '21'
+        }
+
+        const response = await api
+            .post('/api/users')
+            .send(user)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        expect(response.body.error)
+            .toContain('username and password must contain at least 3 characters')
+
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+    })
+
+    test('username is not unique, should be unsuccessful', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const user = {
+            username: 'test_user',
+            name: 'Successful User',
+            password: 'asdasdasdas'
+        }
+
+        const response = await api
+            .post('/api/users')
+            .send(user)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        expect(response.body.error)
+            .toContain('expected `username` to be unique')
+
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+    })
 })
 
 
