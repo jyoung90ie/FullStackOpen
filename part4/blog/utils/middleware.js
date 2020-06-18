@@ -1,3 +1,5 @@
+const logger = require('../utils/logger')
+
 const errorHandler = (error, request, response, next) => {
     if (error.name === 'ValidationError') {
         return response
@@ -7,6 +9,10 @@ const errorHandler = (error, request, response, next) => {
         return response
             .status(401)
             .json({ error: 'invalid token' })
+    } else if (error.name === 'CastError') {
+        return response
+            .status(400)
+            .json({ error: 'invalid id' })
     }
 
     logger.error(error.message)
