@@ -12,7 +12,6 @@ usersRouter.get('/', async (request, response) => {
 usersRouter.post('/', async (request, response) => {
     const body = request.body
 
-
     // perform validation
     if (body.username === undefined || body.password === undefined) {
         return response
@@ -35,19 +34,8 @@ usersRouter.post('/', async (request, response) => {
         passwordHash
     })
 
-    // try {
-
     const savedUser = await user.save()
     response.json(savedUser)
-    // } catch (exception) {
-    //     if (exception.name === 'ValidationError') {
-    //         return response
-    //             .status(400)
-    //             .json({ error: exception.message })
-    //     }
-    //     console.error(exception)
-    // }
 })
-
 
 module.exports = usersRouter

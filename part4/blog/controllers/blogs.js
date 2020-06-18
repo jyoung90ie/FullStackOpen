@@ -53,15 +53,20 @@ blogsRouter.delete('/:id', async (request, response) => {
             .json({ error: 'You need to be logged in to complete this' })
     }
 
-    const user = await User.findById(decodedToken.id)
+    const userid = decodedToken.id
     const blog = await Blog.findById(request.params.id)
+
 
     if (!blog) {
         return response.status(400).json({ error: 'Blog does not exist' })
     }
 
+    if (!blog.user) {
+        return response.status(400).json({ error: 'Blog does not have a user' })
+    }
+
     // check blog user is the user attempting to delete
-    if (user._id.toString() !== blog.user.toString()) {
+    if (userid.toString() !== blog.user.toString()) {
         return response
             .status(401)
             .json({ error: 'You do not have permission to delete the blog' })
@@ -81,10 +86,14 @@ blogsRouter.put('/:id', async (request, response) => {
         url: body.url,
     }
 
-    const updatedBlog = await Blog.findByIdAndUpdate(
-        request.params.id,
-        blog,
-        { new: true })
+    const updatedBlog = await Blog
+        .findByIdAndUpdate(
+            request.params.id,
+            blog,
+            { new: true }
+        )
+        // join user data - returned to enable testing to match /api/blogs object
+        .populate('user', { name: 1, username: 1 })
 
     response.json(updatedBlog)
 })
