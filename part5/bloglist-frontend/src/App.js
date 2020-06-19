@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -8,6 +9,8 @@ const App = () => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
+    const [message, setMessage] = useState(null)
+    const [error, setError] = useState(null)
 
     useEffect(() => {
         blogService.getAll().then(blogs =>
@@ -26,6 +29,16 @@ const App = () => {
         }
     }, [])
 
+    const handleSetMessage = (message) => {
+        setMessage(message)
+        setTimeout(() => setMessage(null), 5000)
+    }
+
+    const handleSetError = (error) => {
+        setError(`Error: ${error}`)
+        setTimeout(() => setError(null), 5000)
+    }
+
     const handleLogin = async (event) => {
         event.preventDefault()
         try {
@@ -40,10 +53,11 @@ const App = () => {
             blogService.setToken(user.token)
 
             setUser(user)
+            handleSetMessage('You are now logged in')
             setUsername('')
             setPassword('')
         } catch (exception) {
-            console.log(exception)
+            handleSetError(exception.response.data.error)
         }
     }
 
@@ -52,6 +66,7 @@ const App = () => {
             setUser(null)
             window.localStorage.removeItem('userLoggedInBlogApp')
             blogService.setToken(null)
+            handleSetMessage('You are now logged out')
         }
     }
 
@@ -68,13 +83,14 @@ const App = () => {
             url,
         }
 
-        const newBlog = await blogService.create(blog)
 
-        if (newBlog) {
+
+        try {
+            const newBlog = await blogService.create(blog)
             setBlogs(blogs.concat(newBlog))
-            console.log('new blog', newBlog)
-        } else {
-            console.log('error', newBlog)
+            handleSetMessage(`New blog '${title}' by ${author} added`)
+        } catch (exception) {
+            handleSetError(exception.response.data.error)
         }
     }
 
@@ -101,39 +117,47 @@ const App = () => {
 
     // output to user below
 
-    if (user === null) {
-        return (
-            <div>
-                <h2>Log in to application</h2>
-                <form onSubmit={handleLogin}>
-                    Username: <input
-                        type="text"
-                        value={username}
-                        name="Username"
-                        onChange={({ target }) => setUsername(target.value)}
-                    /> <br />
-                    Password: <input
-                        type="password"
-                        value={password}
-                        name="Password"
-                        onChange={({ target }) => setPassword(target.value)}
-                    /><br />
-                    <input type="submit" />
-                </form>
-            </div>
-        )
-    }
-
-
-    return (
+    const loginForm = () => (
         <div>
-            <h2>blogs</h2>
+            <h2>Log in to application</h2>
+            <form onSubmit={handleLogin}>
+                Username: <input
+                    type="text"
+                    value={username}
+                    name="Username"
+                    onChange={({ target }) => setUsername(target.value)}
+                /> <br />
+                    Password: <input
+                    type="password"
+                    value={password}
+                    name="Password"
+                    onChange={({ target }) => setPassword(target.value)}
+                /><br />
+                <input type="submit" />
+            </form>
+        </div>
+    )
+
+    const userLoggedIn = () => (
+        <div>
             <p>Welcome back {user.name}
                 <button onClick={handleLogout}>logout</button></p>
             <AddBlogForm /><br />
             {blogs.map(blog =>
                 <Blog key={blog.id} blog={blog} />
             )}
+        </div>
+    )
+
+    return (
+        <div>
+            <h2>blogs</h2>
+            <Notification message={error} className='messageBox error' />
+            <Notification message={message} className='messageBox success' />
+            {user === null
+                ? loginForm()
+                : userLoggedIn()
+            }
 
         </div>
     )
