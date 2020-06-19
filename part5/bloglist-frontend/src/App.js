@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -70,52 +72,22 @@ const App = () => {
         }
     }
 
-    const addBlog = async event => {
-        event.preventDefault()
-
-        const title = event.target.title.value
-        const author = event.target.author.value
-        const url = event.target.url.value
-
-        const blog = {
-            title,
-            author,
-            url,
-        }
-
-
-
+    const addBlog = async blogObject => {
         try {
-            const newBlog = await blogService.create(blog)
+            const newBlog = await blogService.create(blogObject)
+
             setBlogs(blogs.concat(newBlog))
-            handleSetMessage(`New blog '${title}' by ${author} added`)
+            handleSetMessage(`New blog '${blogObject.title}' by ${blogObject.author} added`)
         } catch (exception) {
             handleSetError(exception.response.data.error)
         }
     }
 
-    const AddBlogForm = () => (
-        <div>
-            <h2>Create new</h2>
-            <form onSubmit={addBlog}>
-                title: <input
-                    type="text"
-                    name="title"
-                /><br />
-            author: <input
-                    type="text"
-                    name="author"
-                /><br />
-            url: <input
-                    type="text"
-                    name="url"
-                /><br />
-                <input type="submit" value="create" />
-            </form>
-        </div>
+    const blogForm = () => (
+        <Togglable buttonLabel='new blog'>
+            <BlogForm createBlog={addBlog} />
+        </Togglable>
     )
-
-    // output to user below
 
     const loginForm = () => (
         <div>
@@ -142,7 +114,7 @@ const App = () => {
         <div>
             <p>Welcome back {user.name}
                 <button onClick={handleLogout}>logout</button></p>
-            <AddBlogForm /><br />
+            {blogForm()}
             {blogs.map(blog =>
                 <Blog key={blog.id} blog={blog} />
             )}
