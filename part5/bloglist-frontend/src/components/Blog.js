@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import blogService from '../services/blogs'
 import Togglable from './Togglable'
 import BlogForm from './BlogForm'
+import PropTypes from 'prop-types'
 
 const Blog = ({ user, handleSetMessage, handleSetError }) => {
     const [blogs, setBlogs] = useState([])
@@ -126,4 +127,10 @@ const Blog = ({ user, handleSetMessage, handleSetError }) => {
     )
 
 }
+
+Blog.propTypes = {
+    handleSetMessage: PropTypes.func.isRequired,
+    handleSetError: PropTypes.func.isRequired
+}
+
 export default Blog
