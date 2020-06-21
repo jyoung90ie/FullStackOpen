@@ -78,24 +78,26 @@ blogsRouter.delete('/:id', async (request, response) => {
 })
 
 blogsRouter.put('/:id', async (request, response) => {
-    const body = request.body
+    const object = request.body
 
-    const blog = {
-        title: body.title,
-        author: body.author,
-        url: body.url,
+    const updatedObject = {
+        likes: object.likes,
+        title: object.title,
+        author: object.author,
+        url: object.url,
     }
 
     const updatedBlog = await Blog
         .findByIdAndUpdate(
             request.params.id,
-            blog,
+            updatedObject,
             { new: true }
         )
         // join user data - returned to enable testing to match /api/blogs object
         .populate('user', { name: 1, username: 1 })
 
-    response.json(updatedBlog)
+    response.json(updatedBlog.toJSON())
+
 })
 
 module.exports = blogsRouter

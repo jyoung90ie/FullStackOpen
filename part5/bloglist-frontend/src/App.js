@@ -7,19 +7,14 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
-    const [blogs, setBlogs] = useState([])
+    // const [blogs, setBlogs] = useState([])
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
     const [message, setMessage] = useState(null)
     const [error, setError] = useState(null)
 
-    useEffect(() => {
-        blogService.getAll().then(blogs =>
-            setBlogs(blogs)
-        )
-    }, [])
-
+    // check to see if the user has account information
     useEffect(() => {
         const userLoggedInBlogApp = window.localStorage.getItem('userLoggedInBlogApp')
 
@@ -72,22 +67,6 @@ const App = () => {
         }
     }
 
-    const addBlog = async blogObject => {
-        try {
-            const newBlog = await blogService.create(blogObject)
-
-            setBlogs(blogs.concat(newBlog))
-            handleSetMessage(`New blog '${blogObject.title}' by ${blogObject.author} added`)
-        } catch (exception) {
-            handleSetError(exception.response.data.error)
-        }
-    }
-
-    const blogForm = () => (
-        <Togglable buttonLabel='new blog'>
-            <BlogForm createBlog={addBlog} />
-        </Togglable>
-    )
 
     const loginForm = () => (
         <div>
@@ -114,10 +93,7 @@ const App = () => {
         <div>
             <p>Welcome back {user.name}
                 <button onClick={handleLogout}>logout</button></p>
-            {blogForm()}
-            {blogs.map(blog =>
-                <Blog key={blog.id} blog={blog} />
-            )}
+            {/* {Blog.blogForm()} */}
         </div>
     )
 
@@ -130,7 +106,9 @@ const App = () => {
                 ? loginForm()
                 : userLoggedIn()
             }
-
+            <Blog
+                handleSetMessage={handleSetMessage}
+                handleSetError={handleSetError} />
         </div>
     )
 }
