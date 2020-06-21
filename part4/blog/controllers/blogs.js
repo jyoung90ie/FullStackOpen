@@ -36,11 +36,15 @@ blogsRouter.post('/', async (request, response) => {
     })
 
     const savedBlog = await blog.save()
+    // override user field with user object (simulating populate object)
+    // user.username is needed to determine if user has delete permissions
+    savedBlog.user = user
+
 
     user.blogs = user.blogs.concat(savedBlog.id)
     await user.save()
 
-    response.status(201).json(savedBlog)
+    response.status(201).json(savedBlog.toJSON())
 })
 
 blogsRouter.delete('/:id', async (request, response) => {

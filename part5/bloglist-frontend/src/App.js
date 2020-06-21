@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
-import Togglable from './components/Togglable'
-import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -93,7 +91,6 @@ const App = () => {
         <div>
             <p>Welcome back {user.name}
                 <button onClick={handleLogout}>logout</button></p>
-            {/* {Blog.blogForm()} */}
         </div>
     )
 
@@ -107,6 +104,7 @@ const App = () => {
                 : userLoggedIn()
             }
             <Blog
+                user={user}
                 handleSetMessage={handleSetMessage}
                 handleSetError={handleSetError} />
         </div>
