@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
+
 
 const App = () => {
     // const [blogs, setBlogs] = useState([])
@@ -11,8 +14,8 @@ const App = () => {
     const [user, setUser] = useState(null)
     const [message, setMessage] = useState(null)
     const [error, setError] = useState(null)
+    const [blogs, setBlogs] = useState([])
 
-    // check to see if the user has account information
     useEffect(() => {
         const userLoggedInBlogApp = window.localStorage.getItem('userLoggedInBlogApp')
 
@@ -22,6 +25,13 @@ const App = () => {
 
             blogService.setToken(user.token)
         }
+
+        const blogs = async () => {
+            const blogs = await blogService.getAll()
+            setBlogs(blogs)
+        }
+
+        blogs()
     }, [])
 
     const handleSetMessage = (message) => {
@@ -91,8 +101,72 @@ const App = () => {
         <div>
             <p>Welcome back {user.name}
                 <button onClick={handleLogout}>logout</button></p>
+            {addBlogForm()}
         </div>
     )
+
+    const addBlog = async blogObject => {
+        try {
+            const newBlog = await blogService.create(blogObject)
+
+            setBlogs(blogs.concat(newBlog))
+            handleSetMessage(`New blog '${blogObject.title}' by ${blogObject.author} added`)
+        } catch (exception) {
+            handleSetError(exception.response.data.error)
+        }
+    }
+
+    const updateLikes = async (blogObject) => {
+        // filter for only blog user clicked
+        // const blogObject = blogs.filter(blog => blog.id === blogId)[0]
+
+        const updatedBlogObject = {
+            ...blogObject,
+            likes: blogObject.likes + 1
+        }
+
+        try {
+            // send put request
+            const response = await blogService.update(blogObject.id, updatedBlogObject)
+
+            // refresh blogs state variable
+            setBlogs(blogs.map(blog => {
+                if (blog.id === blogObject.id) {
+                    return response
+                } else {
+                    return blog
+                }
+            }))
+            handleSetMessage(`You liked the blog '${blogObject.title}'`)
+        } catch (exception) {
+            handleSetError(exception.response.data.error)
+        }
+    }
+
+    const removeBlog = async (blogObject) => {
+        const confirmation = window.confirm(`Are you sure you want to delete '${blogObject.title}' ?`)
+
+        if (!confirmation) {
+            return null
+        }
+
+        try {
+            await blogService.remove(blogObject.id)
+
+            handleSetMessage(`Removed the blog '${blogObject.title}'`)
+            setBlogs(blogs.filter(blog => blog.id !== blogObject.id))
+        } catch (exception) {
+            handleSetError(exception.response.data.error)
+        }
+    }
+
+    const addBlogForm = () => {
+        return (
+            <Togglable buttonLabel='new blog'>
+                <BlogForm createBlog={addBlog} />
+            </Togglable>
+        )
+    }
 
     return (
         <div>
@@ -103,10 +177,19 @@ const App = () => {
                 ? loginForm()
                 : userLoggedIn()
             }
-            <Blog
-                user={user}
-                handleSetMessage={handleSetMessage}
-                handleSetError={handleSetError} />
+            {blogs
+                .sort((a, b) => b.likes - a.likes)
+                .map(blog => {
+                    return (
+                        <Blog
+                            key={blog.id}
+                            blog={blog}
+                            user={user}
+                            updateLikes={updateLikes}
+                            removeBlog={removeBlog} />
+                    )
+                })
+            }
         </div>
     )
 }
