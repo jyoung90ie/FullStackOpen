@@ -4,35 +4,25 @@ import { render, fireEvent } from '@testing-library/react'
 import Blog from './Blog'
 
 describe('<Blog />', () => {
-    // let component
+    let component
+    let blogHeader
+    let blogContent
 
-    // beforeEach(() => {
-    //     const handleSetMessage = jest.fn()
-    //     const handleSetError = jest.fn()
-    //     const user = null
+    const blog = {
+        title: 'This is the title',
+        author: 'John',
+        url: 'http://new.blog/first-post/',
+        likes: 1,
+        user: { username: 'john' }
+    }
 
-    //     component = render(
-    //         <Blog
-    //             user={user}
-    //             handleSetError={handleSetError}
-    //             handleSetMessage={handleSetMessage} />
-    //     )
-    // })
+    beforeEach(() => {
 
-    test('header content displays, togglable content does not', () => {
-        const blog = {
-            title: 'This is the title',
-            author: 'John',
-            url: 'http://new.blog/first-post/',
-            likes: 1,
-            user: { username: 'john' }
-        }
         const user = null
         const removeBlog = jest.fn()
         const updateLikes = jest.fn()
 
-
-        const component = render(
+        component = render(
             <Blog
                 blog={blog}
                 user={user}
@@ -40,17 +30,32 @@ describe('<Blog />', () => {
                 updateLikes={updateLikes} />
         )
 
-        const header = component.container.querySelector('.blogHeader')
-        const content = component.container.querySelector('.blogContent')
+        blogHeader = component.container.querySelector('.blogHeader')
+        blogContent = component.container.querySelector('.blogContent')
+    })
 
-        expect(header).not.toHaveStyle('display: none')
+    test('header content displays, togglable content does not', () => {
+        expect(blogHeader).not.toHaveStyle('display: none')
 
-        expect(header).toHaveTextContent(blog.title)
-        expect(header).toHaveTextContent(blog.author)
-        expect(header).not.toHaveTextContent(blog.url)
-        expect(header).not.toHaveTextContent('likes')
+        expect(blogHeader).toHaveTextContent(blog.title)
+        expect(blogHeader).toHaveTextContent(blog.author)
+        expect(blogHeader).not.toHaveTextContent(blog.url)
+        expect(blogHeader).not.toHaveTextContent('likes')
 
-        expect(content).toHaveStyle('display: none')
+        expect(blogContent).toHaveStyle('display: none')
+    })
+
+    test('blog togglable content displays when button is pressed', () => {
+        const viewButton = component.container.querySelector('button')
+        // simulate clicking the button to view more details on the blog
+        fireEvent.click(viewButton)
+
+        // blog header should now be hidden and blog content should be displayed
+        expect(blogHeader).toHaveStyle('display: none')
+
+        expect(blogContent).not.toHaveStyle('display: none')
+        expect(blogContent).toHaveTextContent(blog.url)
+        expect(blogContent).toHaveTextContent(`likes ${blog.likes}`)
     })
 
 
