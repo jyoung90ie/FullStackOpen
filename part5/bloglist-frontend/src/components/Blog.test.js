@@ -7,6 +7,9 @@ describe('<Blog />', () => {
     let component
     let blogHeader
     let blogContent
+    let updateLikes
+    let removeBlog
+    let user
 
     const blog = {
         title: 'This is the title',
@@ -17,10 +20,9 @@ describe('<Blog />', () => {
     }
 
     beforeEach(() => {
-
-        const user = null
-        const removeBlog = jest.fn()
-        const updateLikes = jest.fn()
+        user = null
+        removeBlog = jest.fn()
+        updateLikes = jest.fn()
 
         component = render(
             <Blog
@@ -56,6 +58,16 @@ describe('<Blog />', () => {
         expect(blogContent).not.toHaveStyle('display: none')
         expect(blogContent).toHaveTextContent(blog.url)
         expect(blogContent).toHaveTextContent(`likes ${blog.likes}`)
+    })
+
+    test('blog togglable content displays when button is pressed', () => {
+        const likeButton = component.getByText('like')
+        // simulate clicking button twice
+        fireEvent.click(likeButton)
+        fireEvent.click(likeButton)
+
+        // check that the button function was invoked twice
+        expect(updateLikes.mock.calls).toHaveLength(2)
     })
 
 
