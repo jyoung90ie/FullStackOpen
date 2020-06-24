@@ -85,6 +85,36 @@ describe('Blog app', function () {
                 cy.get('.success').contains('You liked the blog')
                 cy.get('.blogContent').contains('likes 1')
             })
+
+            it('user can delete own blog', function () {
+                // click button to expand blog contents
+                cy.get('.blogHeader > button').click()
+                // check that remove button exists and click it
+                cy.get('.blogContent').should('contain', 'remove')
+                cy.get('.blogContent').contains('remove').click()
+                // click for success
+                cy.get('.success').contains('Removed the blog')
+                cy.get('html').should('not.contain', 'My First Blog - Yay!')
+            })
+
+            it('user who did not create blog cannot delete it', function () {
+                // logout of account
+                cy.contains('logout').click()
+                // setup new user
+                // setup second user
+                cy.request('POST', 'http://localhost:3001/api/users', {
+                    username: 'different_user',
+                    password: 'testing123',
+                    name: 'Different User'
+                })
+                // login to new user account
+                cy.get('#username').type('different_user')
+                cy.get('#password').type('testing123')
+                cy.get('input[type="submit"]').click()
+                // expand blog and check that 'remove' button is not there
+                cy.contains('view').click()
+                cy.get('.blogContent').should('not.contain', 'remove')
+            })
         })
     })
 })
