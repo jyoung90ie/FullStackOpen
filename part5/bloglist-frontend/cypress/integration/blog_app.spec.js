@@ -41,4 +41,50 @@ describe('Blog app', function () {
             cy.get('@error').should('have.css', 'border-color', 'rgb(255, 0, 0)')
         })
     })
+
+    describe.only('When logged in', function () {
+        beforeEach(function () {
+            cy.visit('http://localhost:3000')
+            // user login - stores token in localstorage for each test
+            cy.get('#username').type('test_user')
+            cy.get('#password').type('testing123')
+            cy.get('input[type="submit"]').click()
+        })
+
+        it('A blog can be created', function () {
+            cy.contains('new blog').click()
+            // populate inputs
+            cy.get('#title').type('My First Blog - Yay!')
+            cy.get('#author').type('Mr Tester')
+            cy.get('#url').type('/my-blog-post-yay/')
+            // submit form
+            cy.get('input[type="submit"][value="create"]').click()
+            // click for success
+            cy.get('.success').contains(`New blog`)
+            cy.get('.blogHeader').contains(`My First Blog - Yay!`)
+        })
+
+        describe('Blog exists', function () {
+            beforeEach(function () {
+                cy.contains('new blog').click()
+                // populate inputs
+                cy.get('#title').type('My First Blog - Yay!')
+                cy.get('#author').type('Mr Tester')
+                cy.get('#url').type('/my-blog-post-yay/')
+                // submit form
+                cy.get('input[type="submit"][value="create"]').click()
+            })
+
+            it('user can click like for a blog', function () {
+                // click button to expand blog contents
+                cy.get('.blogHeader > button').click()
+                // click like button
+                cy.get('.blogContent').contains('likes 0')
+                cy.get('.blogContent > :nth-child(5)').click()
+                // check that message displayed and likes increased 
+                cy.get('.success').contains('You liked the blog')
+                cy.get('.blogContent').contains('likes 1')
+            })
+        })
+    })
 })
