@@ -81,12 +81,14 @@ const App = () => {
             <h2>Log in to application</h2>
             <form onSubmit={handleLogin}>
                 Username: <input
+                    id="username"
                     type="text"
                     value={username}
                     name="Username"
                     onChange={({ target }) => setUsername(target.value)}
                 /> <br />
                     Password: <input
+                    id="password"
                     type="password"
                     value={password}
                     name="Password"
