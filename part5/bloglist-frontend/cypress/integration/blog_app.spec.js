@@ -1,3 +1,5 @@
+const { default: blogs } = require("../../src/services/blogs")
+
 describe('Blog app', function () {
     beforeEach(function () {
         // clear database
@@ -44,11 +46,7 @@ describe('Blog app', function () {
 
     describe.only('When logged in', function () {
         beforeEach(function () {
-            cy.visit('http://localhost:3000')
-            // user login - stores token in localstorage for each test
-            cy.get('#username').type('test_user')
-            cy.get('#password').type('testing123')
-            cy.get('input[type="submit"]').click()
+            cy.login('test_user', 'testing123')
         })
 
         it('A blog can be created', function () {
@@ -66,13 +64,12 @@ describe('Blog app', function () {
 
         describe('Blog exists', function () {
             beforeEach(function () {
-                cy.contains('new blog').click()
-                // populate inputs
-                cy.get('#title').type('My First Blog - Yay!')
-                cy.get('#author').type('Mr Tester')
-                cy.get('#url').type('/my-blog-post-yay/')
-                // submit form
-                cy.get('input[type="submit"][value="create"]').click()
+                cy.createBlog({
+                    title: 'My First Blog - Yay!',
+                    author: 'Mr Tester',
+                    url: '/my-blog-post-yay/'
+                })
+                cy.visit('http://localhost:3000')
             })
 
             it('user can click like for a blog', function () {
@@ -94,26 +91,86 @@ describe('Blog app', function () {
                 cy.get('.blogContent').contains('remove').click()
                 // click for success
                 cy.get('.success').contains('Removed the blog')
-                cy.get('html').should('not.contain', 'My First Blog - Yay!')
+                cy.get('.blogContent').should('not.contain', 'My First Blog - Yay!')
             })
 
             it('user who did not create blog cannot delete it', function () {
                 // logout of account
                 cy.contains('logout').click()
-                // setup new user
-                // setup second user
+                // setup second user and login
                 cy.request('POST', 'http://localhost:3001/api/users', {
                     username: 'different_user',
                     password: 'testing123',
                     name: 'Different User'
                 })
-                // login to new user account
-                cy.get('#username').type('different_user')
-                cy.get('#password').type('testing123')
-                cy.get('input[type="submit"]').click()
+                cy.login('different_user', 'testing123')
                 // expand blog and check that 'remove' button is not there
                 cy.contains('view').click()
                 cy.get('.blogContent').should('not.contain', 'remove')
+            })
+        })
+
+        describe.only('Many blogs exist', function () {
+            beforeEach(function () {
+                // create additional blogs
+                const blogs = [
+                    {
+                        title: 'Second blog',
+                        author: 'Mr Tester',
+                        url: '/my-blog-post-yay/',
+                        likes: 1
+                    },
+                    {
+                        title: 'Third blog',
+                        author: 'Mr Tester',
+                        url: '/my-blog-post-yay/',
+                        likes: 9
+                    },
+                    {
+                        title: 'Fourth blog',
+                        author: 'Mr Tester',
+                        url: '/my-blog-post-yay/',
+                        likes: 17
+                    },
+                    {
+                        title: 'Fifth blog',
+                        author: 'Mr Tester',
+                        url: '/my-blog-post-yay/',
+                        likes: 16
+                    }
+                ]
+
+                // create blogs via api
+                blogs.map(blog => cy.createBlog(blog))
+
+                cy.visit('http://localhost:3000')
+            })
+            it('Blog with the most likes appears at the top', function () {
+
+                cy.get('.blogContent')
+                    .then(blogs => {
+                        // array contains the list of blog titles ordered by likes
+                        const blogTitlesByMostLikes = [
+                            'Fourth blog',
+                            'Fifth blog',
+                            'Third blog',
+                            'Second blog'
+                        ]
+
+                        let arrayOfBlogs = blogs.get()
+                        let blogsText = arrayOfBlogs.map(blog => blog.innerText.toLowerCase())
+
+                        // arrays should have the same length
+                        expect(blogTitlesByMostLikes).to.have.length(blogsText.length)
+
+                        // verify ordering is by most likes, as in blogTitlesByMostLikes
+                        for (let i = 0; i < blogsText.length; i++) {
+                            // blog element text is checked to see if it includes 
+                            // the title of the blog that should be in this position
+                            expect(blogsText[i])
+                                .to.include(blogTitlesByMostLikes[i].toLowerCase())
+                        }
+                    })
             })
         })
     })
