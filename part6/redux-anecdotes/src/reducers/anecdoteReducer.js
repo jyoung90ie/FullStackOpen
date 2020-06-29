@@ -24,7 +24,7 @@ const reducer = (state = initialState, action) => {
         case 'VOTE':
             const id = action.data.id
             const anecdoteToChange = state.find(a => a.id === id)
-            console.log('to update', anecdoteToChange)
+
             const changedAnecdote = {
                 ...anecdoteToChange,
                 votes: anecdoteToChange.votes + 1
@@ -34,6 +34,10 @@ const reducer = (state = initialState, action) => {
                 anecdote.id === id
                     ? changedAnecdote
                     : anecdote)
+        case 'ADD_ANECDOTE':
+            const anecdote = action.data
+
+            return [...state, anecdote]
         default:
             return state
     }
@@ -46,6 +50,15 @@ export const addVote = (id) => {
             id
         }
     }
+}
+
+export const addAnecdote = (anecdote) => {
+    const obj = {
+        type: 'ADD_ANECDOTE',
+        data: asObject(anecdote)
+    }
+
+    return obj
 }
 
 export default reducer
