@@ -10,6 +10,11 @@ const Notification = () => {
         borderWidth: 1
     }
 
+    // do not display notification box if there is no message
+    if (!notification) {
+        return (<></>)
+    }
+
     return (
         <div style={style}>
             {notification}
