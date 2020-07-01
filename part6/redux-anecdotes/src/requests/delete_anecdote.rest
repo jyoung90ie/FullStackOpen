@@ -1,0 +1,3 @@
+# Succesful entry
+DELETE http://localhost:3001/anecdotes/hFMFhFA
+Content-Type: application/json

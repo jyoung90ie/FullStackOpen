@@ -17,9 +17,13 @@ const AnecdoteList = () => {
 
   const dispatch = useDispatch();
 
-  const vote = ({ id, content }) => {
+  const vote = ({ id, content, votes }) => {
     // add user vote
-    dispatch(addVote(id));
+    const object = {
+      votes: votes + 1,
+    };
+
+    dispatch(addVote(id, object));
     // user feedback message
     dispatch(setNotification(`You voted for '${content}'`));
     // remove notification after set time

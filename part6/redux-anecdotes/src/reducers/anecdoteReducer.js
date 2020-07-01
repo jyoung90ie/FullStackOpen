@@ -36,12 +36,14 @@ export const initialise = () => {
   };
 };
 
-export const addVote = (id) => {
-  return {
-    type: "VOTE",
-    data: {
-      id,
-    },
+export const addVote = (id, object) => {
+  return async (dispatch) => {
+    const updatedAnecdote = await anecdoteService.update(id, object);
+
+    return dispatch({
+      type: "VOTE",
+      data: updatedAnecdote,
+    });
   };
 };
 
