@@ -5,16 +5,15 @@ import Notification from "./components/Notification";
 import Filter from "./components/Filter";
 import { useDispatch } from "react-redux";
 
-import noteService from "./services/anecdotes";
 import { initialise } from "./reducers/anecdoteReducer";
 
 const App = () => {
   const dispatch = useDispatch();
+
   useEffect(() => {
-    noteService.getAll().then((notes) => {
-      dispatch(initialise(notes));
-    });
+    dispatch(initialise());
   }, [dispatch]);
+
   return (
     <div>
       <Notification />
