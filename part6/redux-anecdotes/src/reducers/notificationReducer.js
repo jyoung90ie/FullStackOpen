@@ -16,10 +16,14 @@ export const removeNotification = () => {
   };
 };
 
-export const setNotification = (message) => {
-  return {
-    type: "SET_NOTIFICATION",
-    message,
+export const setNotification = (message, seconds = 3) => {
+  return async (dispatch) => {
+    await dispatch({
+      type: "SET_NOTIFICATION",
+      message,
+    });
+    // remove notification after specified time
+    return setTimeout(() => dispatch(removeNotification()), seconds * 1000);
   };
 };
 

@@ -17,9 +17,7 @@ const AnecdoteForm = () => {
     // add anecdote
     dispatch(addAnecdote(anecdote));
     // user feedback message
-    dispatch(setNotification(`You added '${anecdote}'`));
-    // remove notification after set time
-    setTimeout(() => dispatch(removeNotification()), 5000);
+    dispatch(setNotification(`You added '${anecdote}'`, 5));
   };
 
   return (
