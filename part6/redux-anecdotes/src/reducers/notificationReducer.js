@@ -1,3 +1,5 @@
+let removeNotificationTimeoutId;
+
 const reducer = (state = "", action) => {
   console.log(action.type);
   switch (action.type) {
@@ -22,8 +24,16 @@ export const setNotification = (message, seconds = 3) => {
       type: "SET_NOTIFICATION",
       message,
     });
+    // remove any previous timeout to ensure notification is displayed for full time
+    clearTimeout(removeNotificationTimeoutId);
+
     // remove notification after specified time
-    return setTimeout(() => dispatch(removeNotification()), seconds * 1000);
+    removeNotificationTimeoutId = setTimeout(
+      () => dispatch(removeNotification()),
+      seconds * 1000
+    );
+
+    return removeNotificationTimeoutId;
   };
 };
 
