@@ -39,7 +39,9 @@ const mapStateToProps = (state) => {
   }
 
   return {
-    anecdotes: state.anecdotes.filter((a) => a.content.includes(state.filter)),
+    anecdotes: state.anecdotes.filter((anecdote) =>
+      anecdote.content.toLowerCase().includes(state.filter.toLowerCase())
+    ),
   };
 };
 
